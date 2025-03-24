@@ -44,6 +44,31 @@
 // #define USE_ALKAS_DEBUG_LED
 
 
+#ifdef POGO_L431
+#define FIRMWARE_NAME "pogo.dshotesc"
+#define FILE_NAME "POGO_L431"
+#define DEAD_TIME 52
+#define HARDWARE_GROUP_L4_B
+#define TARGET_VOLTAGE_DIVIDER 100
+#define MILLIVOLT_PER_AMP 75
+#define USE_SERIAL_TELEMETRY
+#define EEPROM_START_ADD (uint32_t)0x0800F800
+#endif
+
+
+#ifdef POGO_L431_CAN
+#define FIRMWARE_NAME "pogo.canesc"
+#define FILE_NAME "POGO_L431_CAN"
+#define DRONECAN_SUPPORT 1
+#define DRONECAN_NODE_NAME_ADD_ESC_NUM "pogo.canesc"
+#define DEAD_TIME 150
+#define HARDWARE_GROUP_L4_B
+#define TARGET_VOLTAGE_DIVIDER 100
+#define MILLIVOLT_PER_AMP 75
+#define USE_SERIAL_TELEMETRY
+#endif
+
+
 #ifdef LUMENIER_12S_F421
 #define FIRMWARE_NAME "Lumenier 12s"
 #define FILE_NAME "LUMENIER_12S_F421"
