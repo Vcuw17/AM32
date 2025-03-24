@@ -554,6 +554,14 @@ static void handle_GetNodeInfo(CanardInstance *ins, CanardRxTransfer *transfer)
 
 #ifdef DRONECAN_NODE_NAME
     strncpy((char*)pkt.name.data, DRONECAN_NODE_NAME, sizeof(pkt.name.data));
+#elif defined DRONECAN_NODE_NAME_ADD_ESC_NUM
+    char dronecan_node_name_add_esc_num[30] = DRONECAN_NODE_NAME_ADD_ESC_NUM;
+    char str_index[5] = ".num";
+    char esc_index_str[2];
+    sprintf(esc_index_str, "%d", eepromBuffer.can.esc_index + 1);
+    strcat(dronecan_node_name_add_esc_num, str_index);
+    strcat(dronecan_node_name_add_esc_num, esc_index_str);
+    strncpy((char *)pkt.name.data, (char *)dronecan_node_name_add_esc_num, sizeof(pkt.name.data));
 #else
     strncpy((char*)pkt.name.data, FIRMWARE_NAME, sizeof(pkt.name.data));
 #endif
