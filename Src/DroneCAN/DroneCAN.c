@@ -158,7 +158,7 @@ static const struct parameter {
         { "ADVANCE_LEVEL",          T_UINT8, 0, 4,   2, &eepromBuffer.advance_level},
         { "AUTO_ADVANCE",           T_BOOL,  0, 1,   0, &eepromBuffer.auto_advance},
         { "STARTUP_POWER",          T_UINT8, 50,150, 10, &eepromBuffer.startup_power},
-        { "CURRENT_LIMIT",          T_UINT8, 0, 200, 30, &eepromBuffer.limits.current},
+        { "CURRENT_LIMIT",          T_UINT8, 0, 200, 10, &eepromBuffer.limits.current},
         { "TEMPERATURE_LIMIT",      T_UINT8, 70,255, 120,&eepromBuffer.limits.temperature},
         { "LOW_VOLTAGE_CUTOFF",     T_BOOL,  0, 1,   0,  &eepromBuffer.low_voltage_cut_off},
         { "CELL_VOLTAGE_THRESHOLD", T_UINT16, 250, 350, 300, &low_cell_volt_cutoff},
@@ -276,7 +276,7 @@ static uint32_t millis32(void)
 static const uint8_t default_settings[] = {
     0x01, 0x02, 0x01, 0x01, 0x23, 0x4e, 0x45, 0x4f, 0x45, 0x53, 0x43, 0x20, 0x66, 0x30, 0x35, 0x31,
     0x20, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x02, 0x18, 0x64, 0x37, 0x0e, 0x00, 0x00, 0x05, 0x00,
-    0x80, 0x80, 0x80, 0x32, 0x00, 0x32, 0x00, 0x00, 0x0f, 0x0a, 0x0a, 0x78, 0x1E, 0x06, 0x00, 0x00
+    0x80, 0x80, 0x80, 0x32, 0x00, 0x32, 0x00, 0x00, 0x0f, 0x0a, 0x0a, 0x78, 0x0A, 0x06, 0x00, 0x00
 };
 
 // printf to CAN LogMessage for debugging
