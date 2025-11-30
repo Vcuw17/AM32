@@ -25,33 +25,64 @@ static inline uint32_t sector_size()
     return 2048;
 }
 
-void save_flash_nolib(uint8_t* data, int length, uint32_t add)
+bool save_flash_nolib(const uint8_t* data, uint32_t length, uint32_t add)
 {
-    if ((add & 0x3) != 0 || (length & 0x3) != 0) {
-        return;
-    }
-    /*
-      we need the data to be 32 bit aligned
-     */
-    const uint32_t word_length = length / 4;
+  if ((add & 0x3) != 0 || (length & 0x3) != 0) {
+    return false;
+  }
+  /*
+    we need the data to be 32 bit aligned
+   */
+  const uint32_t word_length = length / 4;
+  const uint32_t sector_sz = sector_size();
+  const uint32_t end_addr = add + length;
 
-    // unlock flash
-    flash_unlock();
+  // unlock flash
+  flash_unlock();
 
-    // erase page if address even divisable by sector size
-    if ((add % sector_size()) == 0) {
-	flash_sector_erase(add);
+  // Erase all sectors that the write will cover
+  // Calculate the first sector address
+  uint32_t first_sector_addr = (add / sector_sz) * sector_sz;
+  // Calculate the last sector address
+  uint32_t last_sector_addr = ((end_addr - 1) / sector_sz) * sector_sz;
+
+  // Erase all sectors in the range
+  for (uint32_t sector_addr = first_sector_addr; sector_addr <= last_sector_addr; sector_addr += sector_sz) {
+    // Check if sector is already erased (all 0xFF)
+    const uint32_t *sector_ptr = (const uint32_t *)sector_addr;
+    bool needs_erase = false;
+    for (uint32_t i = 0; i < sector_sz / 4; i++) {
+      if (sector_ptr[i] != 0xFFFFFFFF) {
+        needs_erase = true;
+        break;
+      }
     }
 
-    uint32_t index = 0;
-    while (index < word_length) {
-	uint32_t word;
-        memcpy(&word, &data[index*4], sizeof(word));
-	flash_word_program(add + (index * 4), word);
-	flash_flag_clear(FLASH_PROGRAM_ERROR | FLASH_EPP_ERROR | FLASH_OPERATE_DONE);
-        index++;
+    if (needs_erase) {
+      flash_status_type erase_status = flash_sector_erase(sector_addr);
+      if (erase_status != FLASH_OPERATE_DONE) {
+        flash_lock();
+        return false;
+      }
     }
-    flash_lock();
+  }
+
+  uint32_t index = 0;
+  while (index < word_length) {
+    uint32_t word;
+    memcpy(&word, &data[index*4], sizeof(word));
+    flash_status_type program_status = flash_word_program(add + (index * 4), word);
+    if (program_status != FLASH_OPERATE_DONE) {
+      flash_lock();
+      return false;
+    }
+    flash_flag_clear(FLASH_PROGRAM_ERROR | FLASH_EPP_ERROR | FLASH_OPERATE_DONE);
+    index++;
+  }
+  flash_lock();
+
+  // ensure data is correct
+  return memcmp(data, (const void *)add, length) == 0;
 }
 
 void read_flash_bin(uint8_t* data, uint32_t add, int out_buff_len)
